@@ -1,4 +1,21 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(./scripts/gem.sh:*)",
+      "Bash(./scripts/daily_blog.sh)",
+      "Bash(python3 scripts/keyword_radar.py:*)",
+      "Bash(python3 scripts/style_check.py:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(date:*)",
+      "Bash(mkdir:*)",
+      "WebSearch",
+      "WebFetch",
+      "Read",
+      "Edit(posts/**)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {

@@ -46,10 +46,15 @@ MSG
 
 if [ "$AUTO_MODE" = "auto" ]; then
   cat <<MSG
+👉 아무 말이나 한 마디 입력하시면 바로 작성이 시작됩니다. ("시작" 도 좋고 엔터도 좋습니다)
+   타이핑 없이 쓰시려면 다음부터는 ./scripts/blog-now.sh 로 여세요.
+
 [클로드에게 지시]
 지금 바로 blog-autopilot 스킬(.claude/skills/blog-autopilot/SKILL.md)의 절차를 따라
 남은 $remain 편을 작성하라. 사용자에게 시작 여부를 되묻지 말 것.
-글쓰기 규칙은 gem-blog-writer 스킬을 그대로 적용한다.
+사용자가 무슨 말을 했든, 그것이 명백히 다른 작업 지시가 아닌 한 블로그 작성을 먼저 진행한다.
+글쓰기 규칙은 gem-blog-writer 스킬을 그대로 적용하고,
+저장 후 python3 scripts/style_check.py 로 전항목 통과를 확인한다.
 MSG
 else
   cat <<MSG
