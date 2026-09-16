@@ -83,6 +83,7 @@ def check(path, audience):
     numbers = re.findall(r"\d[\d,.]*\s*(?:원|만원|년|월|일|시간|분|개|번|퍼센트|%|℃|도|GB|kg)", body)
     reader = len(re.findall(r"여러분", body))
     exp_slots = len(re.findall(r"\[여기에 본인 경험", raw))
+    photo_slots = len(re.findall(r"^\[사진\]", raw, re.M))
 
     # 실버 대상이면 문장 35자 상한
     over_cap = [s for s in sents if P["cap"] and len(s) > P["cap"]]
@@ -107,6 +108,7 @@ def check(path, audience):
     line(len(numbers) >= 5, "구체적 수치", f"{len(numbers)}개 (목표 5개↑)")
     line(reader <= 2, "'여러분' 사용", f"{reader}회 (상한 2)")
     line(1 <= exp_slots <= 2, "본인 경험 자리", f"{exp_slots}곳 (목표 1~2)")
+    line(3 <= photo_slots <= 5, "[사진] 자리", f"{photo_slots}곳 (목표 3~5)")
     if P["cap"]:
         line(not over_cap, f"문장 {P['cap']}자 상한", "통과" if not over_cap else f"{len(over_cap)}문장 초과 → {[s[:22] for s in over_cap[:3]]}")
     return ok, dict(chars=chars, short_pct=short_pct, avg=avg, sd=sd, one=len(one_line_paras),
