@@ -80,3 +80,70 @@ scripts/gem.sh              ← 관리 CLI
 | **Slash command** (`.claude/commands/`) | 저장된 프롬프트 | 내가 직접 호출하는 정형 작업 |
 
 Gem과 가장 결이 같은 건 **Skills**이고, 자동 호출·도구 사용·버전 관리(git)가 된다는 점에서 한 단계 위입니다.
+
+---
+
+# 블로그 자동화
+
+매일 컴퓨터를 켜고 클로드 코드를 열면, 키워드 선정부터 완성 원고까지 **묻지 않고 3편**을 씁니다.
+
+## 켜고 끄기
+
+`blog.config` 한 파일이 전부입니다.
+
+```bash
+AUTO_MODE=auto      # auto(바로 씀) | ask(물어봄) | off(끔)
+POSTS_PER_DAY=3
+PLATFORM=naver      # naver | brunch
+```
+
+## 동작 흐름
+
+```
+클로드 코드 실행
+  └─ SessionStart 훅 → scripts/daily_blog.sh
+       ├─ 오늘 3편 다 썼나? → 예: 조용히 종료
+       └─ 아니오
+            ├─ scripts/keyword_radar.py 로 키워드 3개 선정
+            │    1) 구글 트렌드 실시간 RSS
+            │    2) 네이버 데이터랩 API (키 있으면)
+            │    3) keywords/bank.json 시드 뱅크 ← 항상 동작
+            └─ 클로드에게 "blog-autopilot 스킬로 3편 써라" 지시
+                 ├─ 시드 → 웹 검색으로 실검색 롱테일 키워드 확정
+                 ├─ 수치·제도 검증 + 출처 확보
+                 ├─ gem-blog-writer 문체 규칙으로 집필
+                 └─ posts/YYYY-MM-DD/01~03-*.md 저장
+```
+
+**독자 배분**: 40~50대 2편 + 60대 이상 실버 1편 (자동 로테이션)
+**중복 방지**: `keywords/used.log`에 기록해 120일 내 재사용 차단, 테마도 분산
+
+## 수동 실행
+
+```bash
+/blog-daily                     # 오늘치 자동 생산
+/blog 국민연금 조기수령          # 주제 지정해 1편
+python3 scripts/keyword_radar.py  # 키워드만 뽑아보기
+```
+
+## 트렌드 API 연결 (선택)
+
+네이버 데이터랩을 쓰려면 [네이버 개발자센터](https://developers.naver.com)에서 앱을 등록하고
+환경변수 2개만 넣으면 됩니다. 없어도 시드 뱅크로 돌아갑니다.
+
+```bash
+export NAVER_CLIENT_ID=...
+export NAVER_CLIENT_SECRET=...
+```
+
+## 알아두실 점
+
+- **네이버 블로그 자동 업로드는 안 됩니다.** 네이버가 외부 글쓰기 API를 열어두지 않아,
+  완성 원고를 만드는 것까지가 한계입니다. 복사해서 붙여넣으세요.
+- 원고에 `[여기에 본인 경험]` 표시가 1~2곳 들어갑니다. 지어낸 경험을 쓰지 않기 위한 장치이고,
+  형님이 직접 채우면 글의 급이 확 올라갑니다.
+- 검증 못 한 수치는 본문에서 빼고 글 끝 `[확인 필요]`에 모읍니다.
+
+## 키워드 뱅크 늘리기
+
+`keywords/bank.json`의 테마별 배열에 단어만 추가하면 됩니다. 현재 11개 테마 × 2개 독자층 = 220개.
